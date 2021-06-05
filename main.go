@@ -3,10 +3,38 @@ package main
 import (
 	"log"
 
-	"github.com/gofiber/fiber/v2"
+	"ozigo/app"
+	"ozigo/routes"
 )
 
 func main() {
-	app := fiber.New()
-	log.Fatal(app.Listen(":8080"))
+	a := app.Instance()
+
+	// Auto-migrate database models
+	if a.DB != nil {
+		err := a.DB.MigrateModels()
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	// Register tracer
+	tracer, closer, err := a.Config.GetTracerConfig().NewTracer()
+	if err != nil {
+		log.Println("failed to load tracer:", err.Error())
+	} else {
+		a.Tracer = &tracer
+		defer closer.Close()
+	}
+
+	// Register middlewares
+	a.RegisterMiddlewares(routes.SkipperStatic)
+
+	// Register routes
+	routes.RegisterStatic(a.Server)
+	routes.RegisterAPI(a.Server)
+	routes.RegisterWeb(a.Server)
+
+	// Start listening on the specified address
+	log.Fatal(a.Server.Listen(":" + a.Config.GetString("APP_PORT")))
 }
