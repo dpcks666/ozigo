@@ -1,7 +1,7 @@
 package routes
 
 import (
-	Controller "ozigo/app/controllers/api"
+	Controller "ozigo/controllers/api"
 
 	"github.com/gofiber/fiber/v2"
 )

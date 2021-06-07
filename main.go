@@ -5,9 +5,12 @@ import (
 
 	"ozigo/app"
 	"ozigo/routes"
+
+	"github.com/opentracing/opentracing-go"
 )
 
 func main() {
+	// Init app
 	a := app.Instance()
 
 	// Auto-migrate database models
@@ -23,6 +26,7 @@ func main() {
 	if err != nil {
 		log.Println("failed to load tracer:", err.Error())
 	} else {
+		opentracing.SetGlobalTracer(tracer)
 		a.Tracer = &tracer
 		defer closer.Close()
 	}

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <title>Simple HTML document</title>
-  <link rel="stylesheet" href="css/app.css">
-  <script src="js/app.js" async></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/js/app.js" async></script>
 </head>
 <body>
   <h1>Hello World!</h1>

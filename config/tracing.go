@@ -1,14 +1,13 @@
 package config
 
 import (
-	"fmt"
+	"log"
 
-	"github.com/gofiber/fiber/v2"
 	jaeger "github.com/uber/jaeger-client-go/config"
 )
 
 func (config *Config) GetTracerConfig() *jaeger.Configuration {
-	config.SetDefault("JAEGER_SERVICE_NAME", "fiber/"+fiber.Version)
+	config.SetDefault("JAEGER_SERVICE_NAME", config.GetString("APP_NAME"))
 	config.SetDefault("JAEGER_SAMPLER_TYPE", "const")
 	config.SetDefault("JAEGER_SAMPLER_PARAM", 1)
 	config.SetDefault("JAEGER_REPORTER_LOG_SPANS", true)
@@ -27,7 +26,7 @@ func (config *Config) GetTracerConfig() *jaeger.Configuration {
 	}
 	cfg, err := defcfg.FromEnv()
 	if err != nil {
-		fmt.Println("Could not parse Jaeger env vars: ", err.Error())
+		log.Println("Could not parse Jaeger env vars: ", err.Error())
 	}
 
 	return cfg

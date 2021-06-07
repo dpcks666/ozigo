@@ -1,8 +1,8 @@
 package api
 
 import (
-	"ozigo/app/models"
 	"ozigo/database"
+	"ozigo/models"
 
 	"github.com/gofiber/fiber/v2"
 )

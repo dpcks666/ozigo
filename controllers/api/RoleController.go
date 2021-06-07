@@ -2,7 +2,7 @@ package api
 
 import (
 	"ozigo/app"
-	"ozigo/app/models"
+	"ozigo/models"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,6 +10,7 @@ import (
 // Return all roles as JSON
 func GetAllRoles(c *fiber.Ctx) error {
 	db := app.Instance().DB
+
 	var Role []models.Role
 	if response := db.Find(&Role); response.Error != nil {
 		panic("Error occurred while retrieving roles from the database: " + response.Error.Error())
@@ -26,30 +27,16 @@ func GetAllRoles(c *fiber.Ctx) error {
 func GetRole(c *fiber.Ctx) error {
 	db := app.Instance().DB
 	Role := new(models.Role)
-	id := c.Params("id")
-	if response := db.Find(&Role, id); response.Error != nil {
+	id, _ := c.ParamsInt("id")
+	if response := db.Find(&Role, "id = ?", id); response.Error != nil {
 		panic("An error occurred when retrieving the role: " + response.Error.Error())
 	}
 	if Role.ID == 0 {
-		// Send status not found
-		err := c.SendStatus(fiber.StatusNotFound)
-		if err != nil {
-			panic("Cannot return status not found: " + err.Error())
-		}
-		// Set ID
-		err = c.JSON(fiber.Map{
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"ID": id,
 		})
-		if err != nil {
-			panic("Error occurred when returning JSON of a role: " + err.Error())
-		}
-		return err
 	}
-	err := c.JSON(Role)
-	if err != nil {
-		panic("Error occurred when returning JSON of a role: " + err.Error())
-	}
-	return err
+	return c.JSON(Role)
 }
 
 // Add a single role to the database

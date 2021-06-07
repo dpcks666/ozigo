@@ -1,7 +1,7 @@
 package database
 
 import (
-	"ozigo/app/models"
+	"ozigo/models"
 )
 
 func (db *Database) MigrateModels() error {
