@@ -3,20 +3,15 @@ package routes
 import (
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 )
 
-func RegisterStatic(app *fiber.App) {
-	config := fiber.Static{
-		Compress:  true,
-		ByteRange: true,
-	}
-
-	app.Static("/static", "./public", config)
-	app.Static("/robots.txt", "./public/robots.txt", config)
+func RegisterStatic(e *echo.Echo) {
+	e.Static("/static", "./public")
+	e.File("/robots.txt", "./public/robots.txt")
 }
 
-func SkipperStatic(c *fiber.Ctx) bool {
+func StaticSkipper(c echo.Context) bool {
 	paths := []string{
 		"/static",
 		"/robots.txt",

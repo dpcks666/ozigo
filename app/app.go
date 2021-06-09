@@ -4,24 +4,21 @@ import (
 	"ozigo/config"
 	"ozigo/database"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/etag"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/middleware/monitor"
-	"github.com/gofiber/fiber/v2/middleware/pprof"
-	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gorilla/sessions"
+	tracer "github.com/labstack/echo-contrib/jaegertracing"
+	"github.com/labstack/echo-contrib/pprof"
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/opentracing/opentracing-go"
-	tracer "github.com/shareed2k/fiber_tracing"
 )
 
 type App struct {
-	Server  *fiber.App
-	Config  *config.Config
-	DB      *database.Database
-	Session *session.Store
-	Tracer  *opentracing.Tracer
+	*echo.Echo
+	Config *config.Config
+	DB     *database.Database
+	Store  sessions.Store
+	Tracer *opentracing.Tracer
 }
 
 var app *App
@@ -32,49 +29,56 @@ func init() {
 		panic(err)
 	}
 
+	// app struct init
 	app = &App{
-		Server:  fiber.New(config.GetFiberConfig()),
-		Config:  config,
-		DB:      database.New(config.GetDatabaseDialector()),
-		Session: session.New(config.GetSessionConfig()),
+		Echo:   echo.New(),
+		Config: config,
+		DB:     database.New(config.GetDatabaseDialector()),
+		Store:  sessions.NewCookieStore([]byte(config.GetString("SESSION_KEY"))),
 	}
+
+	// app settings
+	app.Debug = config.GetBool("APP_DEBUG")
+	app.HideBanner = true
 }
 
 func Instance() *App {
 	return app
 }
 
-func (a *App) RegisterMiddlewares(skipper func(c *fiber.Ctx) bool) {
-	// Debug utils - Pprof, Monitor
-	if a.Config.GetBool("APP_DEBUG") {
-		debug := a.Server.Group("/debug")
-		debug.Use("/pprof/*", pprof.New())
-		debug.Use("/monitor", monitor.New())
+func (a *App) RegisterMiddlewares(skipper func(c echo.Context) bool) {
+	// Debug utils - Pprof
+	if a.Debug {
+		pprof.Register(a.Echo, "/debug/pprof")
 	}
 
 	// Recover
-	a.Server.Use(recover.New(recover.Config{
-		EnableStackTrace: true,
-	}))
+	a.Use(middleware.Recover())
 
 	// Logger
-	a.Server.Use(logger.New(logger.Config{
-		Next: skipper,
+	a.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Skipper: skipper,
 	}))
 
 	// Tracer
-	a.Server.Use(tracer.New(tracer.Config{
-		Tracer: *a.Tracer,
-		Filter: skipper,
+	a.Use(tracer.TraceWithConfig(tracer.TraceConfig{
+		Skipper: skipper,
+		Tracer:  *a.Tracer,
 	}))
 
 	// Compress
-	a.Server.Use(compress.New(compress.Config{
-		Next: skipper,
+	a.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Skipper: skipper,
 	}))
 
-	// Etag
-	a.Server.Use(etag.New(etag.Config{
-		Next: skipper,
+	// Session
+	a.Use(session.MiddlewareWithConfig(session.Config{
+		Skipper: skipper,
+		Store:   a.Store,
+	}))
+
+	// Request ID
+	a.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
+		Skipper: skipper,
 	}))
 }

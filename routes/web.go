@@ -1,20 +1,36 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"net/http"
+	"ozigo/app"
+	"time"
+
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo/v4"
 )
 
-func RegisterWeb(app *fiber.App) {
+func RegisterWeb(e *echo.Echo) {
 	// Homepage
 	//web.Get("/", Controller.Index(a))
 
 	// Panic test route, this brings up an error
-	app.Get("/panic", func(ctx *fiber.Ctx) error {
+	e.GET("/panic", func(c echo.Context) error {
 		panic("Hi, I'm a panic error!")
 	})
 
 	// Test to load static, compiled assets
-	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.Render("test", fiber.Map{})
+	e.GET("/test", func(c echo.Context) error {
+		session, _ := app.Instance().Store.Get(c.Request(), "test")
+		session.Options = &sessions.Options{
+			Path:     "/",
+			MaxAge:   86400 * 7,
+			HttpOnly: true,
+		}
+		app.Instance().Logger.Error(session.Values)
+		session.Values["foo"] = "bar"
+		session.Values["time"] = time.Now()
+		app.Instance().Logger.Error(session.Values)
+		session.Save(c.Request(), c.Response())
+		return c.JSON(http.StatusOK, "test")
 	})
 }

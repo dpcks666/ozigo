@@ -32,13 +32,13 @@ func main() {
 	}
 
 	// Register middlewares
-	a.RegisterMiddlewares(routes.SkipperStatic)
+	a.RegisterMiddlewares(routes.StaticSkipper)
 
 	// Register routes
-	routes.RegisterStatic(a.Server)
-	routes.RegisterAPI(a.Server)
-	routes.RegisterWeb(a.Server)
+	routes.RegisterStatic(a.Echo)
+	//routes.RegisterAPI(a.Echo)
+	routes.RegisterWeb(a.Echo)
 
 	// Start listening on the specified address
-	log.Fatal(a.Server.Listen(":" + a.Config.GetString("APP_PORT")))
+	a.Logger.Fatal(a.Start(":" + a.Config.GetString("APP_PORT")))
 }

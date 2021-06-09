@@ -83,6 +83,7 @@ require (
 	github.com/golangci/unconvert v0.0.0-20180507085042-28b1c447d1f4 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/gordonklaus/ineffassign v0.0.0-20210522101830-0589229737b2 // indirect
+	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
 	github.com/gostaticanalysis/comment v1.4.2 // indirect
 	github.com/gostaticanalysis/forcetypeassert v0.0.0-20200621232751-01d4955beaa5 // indirect
@@ -113,6 +114,8 @@ require (
 	github.com/kulti/thelper v0.4.0 // indirect
 	github.com/kunwardeep/paralleltest v1.0.2 // indirect
 	github.com/kyoh86/exportloopref v0.1.8 // indirect
+	github.com/labstack/echo-contrib v0.11.0 // indirect
+	github.com/labstack/echo/v4 v4.3.0 // indirect
 	github.com/ldez/gomoddirectives v0.2.1 // indirect
 	github.com/ldez/tagliatelle v0.2.0 // indirect
 	github.com/lib/pq v1.10.2 // indirect
@@ -179,6 +182,7 @@ require (
 	github.com/tinylib/msgp v1.1.5 // indirect
 	github.com/tomarrell/wrapcheck/v2 v2.1.0 // indirect
 	github.com/tommy-muehle/go-mnd/v2 v2.4.0 // indirect
+	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/ultraware/funlen v0.0.3 // indirect
