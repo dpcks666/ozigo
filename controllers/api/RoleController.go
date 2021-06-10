@@ -10,7 +10,6 @@ import (
 // Return all roles as JSON
 func GetAllRoles(c *fiber.Ctx) error {
 	db := app.Instance().DB
-
 	var Role []models.Role
 	if response := db.Find(&Role); response.Error != nil {
 		panic("Error occurred while retrieving roles from the database: " + response.Error.Error())
