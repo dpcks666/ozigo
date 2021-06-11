@@ -3,9 +3,7 @@ package routes
 import (
 	"net/http"
 	"ozigo/app"
-	"time"
 
-	"github.com/gorilla/sessions"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,15 +18,10 @@ func RegisterWeb(e *echo.Echo) {
 
 	// Test to load static, compiled assets
 	e.GET("/test", func(c echo.Context) error {
-		session, _ := app.Instance().Store.Get(c.Request(), "test")
-		session.Options = &sessions.Options{
-			Path:     "/",
-			MaxAge:   86400 * 7,
-			HttpOnly: true,
-		}
+		session, _ := app.Instance().Store.Get(c.Request(), "session_id")
+
 		app.Instance().Logger.Error(session.Values)
 		session.Values["foo"] = "bar"
-		session.Values["time"] = time.Now()
 		app.Instance().Logger.Error(session.Values)
 		session.Save(c.Request(), c.Response())
 		return c.JSON(http.StatusOK, "test")

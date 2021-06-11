@@ -1,12 +1,11 @@
 package main
 
 import (
-	"log"
-
 	"ozigo/app"
 	"ozigo/routes"
 
-	"github.com/opentracing/opentracing-go"
+	"github.com/labstack/echo-contrib/jaegertracing"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -14,25 +13,38 @@ func main() {
 	a := app.Instance()
 
 	// Auto-migrate database models
-	if a.DB != nil {
-		err := a.DB.MigrateModels()
-		if err != nil {
-			panic(err)
-		}
+	err := a.DB.MigrateModels()
+	if err != nil {
+		panic(err)
 	}
 
 	// Register tracer
 	tracer, closer, err := a.Config.GetTracerConfig().NewTracer()
 	if err != nil {
-		log.Println("failed to load tracer:", err.Error())
-	} else {
-		opentracing.SetGlobalTracer(tracer)
-		a.Tracer = &tracer
-		defer closer.Close()
+		panic(err)
 	}
+	defer closer.Close()
 
 	// Register middlewares
-	a.RegisterMiddlewares(routes.StaticSkipper)
+	// Recover
+	a.Use(middleware.Recover())
+	// Logger
+	a.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Skipper: routes.StaticSkipper,
+	}))
+	// Tracer
+	a.Use(jaegertracing.TraceWithConfig(jaegertracing.TraceConfig{
+		Skipper: routes.StaticSkipper,
+		Tracer:  tracer,
+	}))
+	// Compress
+	a.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Skipper: routes.StaticSkipper,
+	}))
+	// Request ID
+	a.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
+		Skipper: routes.StaticSkipper,
+	}))
 
 	// Register routes
 	routes.RegisterStatic(a.Echo)
