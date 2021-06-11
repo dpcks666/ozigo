@@ -21,21 +21,18 @@ func main() {
 	a := app.Instance()
 
 	// Auto-migrate database models
-	if a.DB != nil {
-		err := a.DB.MigrateModels()
-		if err != nil {
-			panic(err)
-		}
+	err := a.DB.MigrateModels()
+	if err != nil {
+		panic(err)
 	}
 
 	// Register tracer
 	tracer, closer, err := a.Config.GetTracerConfig().NewTracer()
 	if err != nil {
-		log.Println("failed to load tracer:", err.Error())
-	} else {
-		opentracing.SetGlobalTracer(tracer)
-		defer closer.Close()
+		panic(err)
 	}
+	opentracing.SetGlobalTracer(tracer)
+	defer closer.Close()
 
 	// Register middlewares
 	if a.Config.GetBool("APP_DEBUG") {
