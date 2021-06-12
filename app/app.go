@@ -1,6 +1,7 @@
 package app
 
 import (
+	"net/http"
 	"ozigo/config"
 	"ozigo/database"
 
@@ -28,7 +29,7 @@ func init() {
 	app = &App{
 		Echo:   echo.New(),
 		DB:     database.New(config.GetDatabaseDialector()),
-		Store:  sessions.NewCookieStore([]byte(config.GetString("APP_SECRET_KEY"))),
+		Store:  sessions.NewFilesystemStore("./tmp", []byte(config.GetString("APP_KEY"))),
 		Config: config,
 	}
 
@@ -43,4 +44,8 @@ func init() {
 
 func Instance() *App {
 	return app
+}
+
+func (a *App) Session(r *http.Request) (*sessions.Session, error) {
+	return a.Store.Get(r, "session_id")
 }

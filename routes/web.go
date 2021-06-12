@@ -18,11 +18,8 @@ func RegisterWeb(e *echo.Echo) {
 
 	// Test to load static, compiled assets
 	e.GET("/test", func(c echo.Context) error {
-		session, _ := app.Instance().Store.Get(c.Request(), "session_id")
-
-		app.Instance().Logger.Error(session.Values)
+		session, _ := app.Instance().Session(c.Request())
 		session.Values["foo"] = "bar"
-		app.Instance().Logger.Error(session.Values)
 		session.Save(c.Request(), c.Response())
 		return c.JSON(http.StatusOK, "test")
 	})
