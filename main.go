@@ -5,7 +5,6 @@ import (
 	"ozigo/routes"
 
 	"github.com/labstack/echo-contrib/jaegertracing"
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4/middleware"
 )
 
@@ -46,7 +45,6 @@ func main() {
 	a.Use(middleware.RequestIDWithConfig(middleware.RequestIDConfig{
 		Skipper: routes.StaticSkipper,
 	}))
-	a.Use(session.Middleware(app.Instance().Store))
 
 	// Register routes
 	routes.RegisterStatic(a.Echo)
