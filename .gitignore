@@ -8,6 +8,8 @@ __debug_bin
 
 # Local data
 .env
+storage/*
+!storage/.gitkeep
 
 # Cache file
 *.fiber.gz

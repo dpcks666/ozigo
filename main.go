@@ -12,8 +12,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/opentracing/opentracing-go"
-	fiberTracer "github.com/shareed2k/fiber_tracing"
 )
 
 func main() {
@@ -25,15 +23,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	// Register tracer
-	tracer, closer, err := a.Config.GetTracerConfig().NewTracer()
-	if err != nil {
-		panic(err)
-	}
-	opentracing.SetGlobalTracer(tracer)
-	defer closer.Close()
-
+	a.Logger.Info("test")
 	// Register middlewares
 	if a.Config.GetBool("APP_DEBUG") {
 		// Debug utils - Pprof, Monitor
@@ -48,11 +38,6 @@ func main() {
 	// Logger
 	a.Server.Use(logger.New(logger.Config{
 		Next: routes.SkipperStatic,
-	}))
-	// Tracer
-	a.Server.Use(fiberTracer.New(fiberTracer.Config{
-		Tracer: tracer,
-		Filter: routes.SkipperStatic,
 	}))
 	// Compress
 	a.Server.Use(compress.New(compress.Config{

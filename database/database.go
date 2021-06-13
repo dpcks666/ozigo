@@ -1,8 +1,6 @@
 package database
 
 import (
-	"log"
-
 	"gorm.io/gorm"
 )
 
@@ -11,9 +9,16 @@ type Database struct {
 }
 
 func New(config gorm.Dialector) *Database {
+	// open gorm database
 	db, err := gorm.Open(config, &gorm.Config{})
 	if err != nil {
-		log.Println("failed to connect to database:", err.Error())
+		panic(err)
+	}
+
+	// connect gorm database
+	_, err = db.DB()
+	if err != nil {
+		panic(err)
 	}
 	return &Database{db}
 }

@@ -6,12 +6,14 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"go.uber.org/zap"
 )
 
 type App struct {
 	Server *fiber.App
 	DB     *database.Database
 	Store  *session.Store
+	Logger *zap.Logger
 	Config *config.Config
 }
 
@@ -27,6 +29,7 @@ func init() {
 		Server: fiber.New(config.GetFiberConfig()),
 		DB:     database.New(config.GetDatabaseDialector()),
 		Store:  session.New(config.GetSessionConfig()),
+		Logger: zap.New(config.GetLoggerConfig()),
 		Config: config,
 	}
 }

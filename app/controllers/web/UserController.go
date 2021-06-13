@@ -2,8 +2,8 @@ package web
 
 import (
 	"errors"
+	"ozigo/app/models"
 	"ozigo/database"
-	"ozigo/models"
 )
 
 // Return a single user as JSON
