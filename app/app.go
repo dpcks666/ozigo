@@ -29,7 +29,6 @@ func init() {
 		Server: fiber.New(config.GetFiberConfig()),
 		DB:     database.New(config.GetDatabaseDialector()),
 		Store:  session.New(config.GetSessionConfig()),
-		Logger: zap.New(config.GetLoggerConfig()),
 		Config: config,
 	}
 }

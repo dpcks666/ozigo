@@ -18,12 +18,16 @@ func main() {
 	// Init app
 	a := app.Instance()
 
+	// Init Logger
+	a.Logger, _ = a.Config.GetLoggerConfig().Build()
+	defer a.Logger.Sync()
+
 	// Auto-migrate database models
 	err := a.DB.MigrateModels()
 	if err != nil {
 		panic(err)
 	}
-	a.Logger.Info("test")
+
 	// Register middlewares
 	if a.Config.GetBool("APP_DEBUG") {
 		// Debug utils - Pprof, Monitor
@@ -35,10 +39,8 @@ func main() {
 	a.Server.Use(recover.New(recover.Config{
 		EnableStackTrace: true,
 	}))
-	// Logger
-	a.Server.Use(logger.New(logger.Config{
-		Next: routes.SkipperStatic,
-	}))
+	// Access logger
+	a.Server.Use(logger.New(a.Config.GetAccessLoggerConfig(routes.SkipperStatic)))
 	// Compress
 	a.Server.Use(compress.New(compress.Config{
 		Next: routes.SkipperStatic,

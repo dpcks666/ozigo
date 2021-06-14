@@ -3,8 +3,10 @@ package api
 import (
 	"ozigo/app"
 	"ozigo/app/models"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 // Return all roles as JSON
@@ -14,6 +16,10 @@ func GetAllRoles(c *fiber.Ctx) error {
 	if response := db.Find(&Role); response.Error != nil {
 		panic("Error occurred while retrieving roles from the database: " + response.Error.Error())
 	}
+	app.Instance().Logger.Debug("test123123!!",
+		zap.Time("ttt", Role[0].CreatedAt),
+		zap.Duration("test", 10231023*time.Microsecond),
+	)
 	err := c.JSON(Role)
 	if err != nil {
 		panic("Error occurred when returning JSON of roles: " + err.Error())
