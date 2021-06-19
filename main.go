@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-
 	"ozigo/app"
 	"ozigo/routes"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
 
 func main() {
@@ -23,9 +23,11 @@ func main() {
 	defer a.Logger.Sync()
 
 	// Auto-migrate database models
-	err := a.DB.MigrateModels()
-	if err != nil {
-		panic(err)
+	if a.Config.GetBool("DB_MIGRATE") {
+		err := a.DB.MigrateModels()
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	// Register middlewares
@@ -36,19 +38,15 @@ func main() {
 		debug.Use("/monitor", monitor.New())
 	}
 	// Recover
-	a.Server.Use(recover.New(recover.Config{
-		EnableStackTrace: true,
-	}))
+	a.Server.Use(recover.New(recover.Config{EnableStackTrace: true}))
 	// Access logger
 	a.Server.Use(logger.New(a.Config.GetAccessLoggerConfig(routes.SkipperStatic)))
+	// Request ID
+	a.Server.Use(requestid.New(requestid.Config{Next: routes.SkipperStatic}))
 	// Compress
-	a.Server.Use(compress.New(compress.Config{
-		Next: routes.SkipperStatic,
-	}))
+	a.Server.Use(compress.New(compress.Config{Next: routes.SkipperStatic}))
 	// Etag
-	a.Server.Use(etag.New(etag.Config{
-		Next: routes.SkipperStatic,
-	}))
+	a.Server.Use(etag.New(etag.Config{Next: routes.SkipperStatic}))
 
 	// Register routes
 	routes.RegisterStatic(a.Server)

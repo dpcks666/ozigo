@@ -83,13 +83,6 @@ func (config *Config) setDefaults() {
 	config.SetDefault("MW_FIBER_CSRF_COOKIE_EXPIRES", "24h")
 	config.SetDefault("MW_FIBER_CSRF_CONTEXTKEY", "csrf")
 
-	// Set default Fiber ETag middleware configuration
-	config.SetDefault("MW_FIBER_ETAG_ENABLED", true)
-	config.SetDefault("MW_FIBER_ETAG_WEAK", false)
-
-	// Set default Fiber Expvar middleware configuration
-	config.SetDefault("MW_FIBER_EXPVAR_ENABLED", false)
-
 	// Set default Fiber Limiter middleware configuration
 	config.SetDefault("MW_FIBER_LIMITER_ENABLED", false)
 	config.SetDefault("MW_FIBER_LIMITER_MAX", 60)

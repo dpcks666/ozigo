@@ -8,9 +8,9 @@ type Database struct {
 	*gorm.DB
 }
 
-func New(config gorm.Dialector) *Database {
+func New(dialector gorm.Dialector) *Database {
 	// open gorm database
-	db, err := gorm.Open(config, &gorm.Config{})
+	db, err := gorm.Open(dialector, &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}

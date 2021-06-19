@@ -29,7 +29,7 @@ func (config *Config) GetLoggerConfig() zap.Config {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeTime:     zapcore.RFC3339NanoTimeEncoder,
 		EncodeDuration: zapcore.StringDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
@@ -46,12 +46,9 @@ func (config *Config) GetLoggerConfig() zap.Config {
 
 func (config *Config) GetAccessLoggerConfig(skipper func(c *fiber.Ctx) bool) logger.Config {
 	return logger.Config{
-		Next: skipper,
-		Format: `{"time":"${time}","id":"${id}","remote_ip":"${ip}",` +
-			`"method":"${method}","status":${status},"host":"${host}","url":"${url}","userAgent":"${ua}",` +
-			`"error":"${error}","latency":${latency},"latencyParse"` + "\n",
-		TimeFormat:   "2006-01-02T15:04:05.000Z0700",
-		TimeInterval: 200 * time.Millisecond,
-		Output:       os.Stdout,
+		Next:       skipper,
+		Format:     `{"time":"${time}","id":"${locals:requestid}","remoteIp":"${ip}","status":${status},"method":"${method}","uri":"${protocol}://${host}${url}","referer":"${referer}","userAgent":"${ua}","error":"${error}","latency":"${latency}","bytesReceived":${bytesReceived},"bytesSent":${bytesSent}}` + "\n",
+		TimeFormat: time.RFC3339,
+		Output:     os.Stdout,
 	}
 }

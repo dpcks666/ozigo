@@ -64,7 +64,6 @@ require (
 	go.uber.org/zap v1.17.0
 	golang.org/x/sys v0.0.0-20210603125802-9665404d3644 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gorm.io/driver/mysql v1.1.0
 	gorm.io/driver/postgres v1.1.0
 	gorm.io/driver/sqlserver v1.0.7
