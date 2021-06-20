@@ -2,6 +2,7 @@ package config
 
 import (
 	"strconv"
+	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -21,5 +22,16 @@ func (config *Config) GetDatabaseDialector() (dialector gorm.Dialector) {
 		dsn := "sqlserver://" + config.GetString("DB_USERNAME") + ":" + config.GetString("DB_PASSWORD") + "@" + config.GetString("DB_HOST") + ":" + strconv.Itoa(config.GetInt("DB_PORT")) + "?database=" + config.GetString("DB_DATABASE")
 		dialector = sqlserver.Open(dsn)
 	}
+	return
+}
+
+func (config *Config) GetDatabaseConnection() (idle, open int, lifetime time.Duration) {
+	config.SetDefault("DB_MAX_IDLE", 10)
+	config.SetDefault("DB_MAX_OPEN", 100)
+	config.SetDefault("DB_MAX_LIFETIME", time.Hour)
+
+	idle = config.GetInt("DB_MAX_IDLE")
+	open = config.GetInt("DB_MAX_OPEN")
+	lifetime = config.GetDuration("DB_MAX_LIFETIME")
 	return
 }

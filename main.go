@@ -22,7 +22,10 @@ func main() {
 	a.Logger, _ = a.Config.GetLoggerConfig().Build()
 	defer a.Logger.Sync()
 
-	// Auto-migrate database models
+	// Set DB connection pool
+	a.DB.SetConnectionPool(a.Config.GetDatabaseConnection())
+
+	// Migrate models
 	if a.Config.GetBool("DB_MIGRATE") {
 		err := a.DB.MigrateModels()
 		if err != nil {

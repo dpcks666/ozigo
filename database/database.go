@@ -1,6 +1,8 @@
 package database
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -15,10 +17,16 @@ func New(dialector gorm.Dialector) *Database {
 		panic(err)
 	}
 
-	// connect gorm database
-	_, err = db.DB()
+	return &Database{db}
+}
+
+func (db *Database) SetConnectionPool(idle, open int, lifetime time.Duration) {
+	// set connection pool
+	sqlDB, err := db.DB.DB()
 	if err != nil {
 		panic(err)
 	}
-	return &Database{db}
+	sqlDB.SetMaxIdleConns(idle)
+	sqlDB.SetMaxOpenConns(open)
+	sqlDB.SetConnMaxLifetime(lifetime)
 }
