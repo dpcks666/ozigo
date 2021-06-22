@@ -11,7 +11,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
 
 func main() {
@@ -44,8 +43,6 @@ func main() {
 	a.Server.Use(recover.New(recover.Config{EnableStackTrace: true}))
 	// Access logger
 	a.Server.Use(logger.New(a.Config.GetAccessLoggerConfig(routes.SkipperStatic)))
-	// Request ID
-	a.Server.Use(requestid.New(requestid.Config{Next: routes.SkipperStatic}))
 	// Compress
 	a.Server.Use(compress.New(compress.Config{Next: routes.SkipperStatic}))
 	// Etag
