@@ -17,6 +17,8 @@ func main() {
 	// Init app
 	a := app.Instance()
 
+	// TODO: https://github.com/gofiber/recipes/tree/master/i18n
+
 	// Init Logger
 	a.Logger, _ = a.Config.GetLoggerConfig().Build()
 	defer a.Logger.Sync()

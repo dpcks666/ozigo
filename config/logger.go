@@ -45,9 +45,11 @@ func (config *Config) GetLoggerConfig() zap.Config {
 }
 
 func (config *Config) GetAccessLoggerConfig(skipper func(c *fiber.Ctx) bool) logger.Config {
+	config.SetDefault("REQUEST_ID", fiber.HeaderXRequestID)
+
 	return logger.Config{
 		Next:       skipper,
-		Format:     `{"time":"${time}","id":"${header:X-Request-Id}","remoteIp":"${ip}","status":${status},"method":"${method}","uri":"${protocol}://${host}${url}","referer":"${referer}","userAgent":"${ua}","error":"${error}","latency":"${latency}","bytesReceived":${bytesReceived},"bytesSent":${bytesSent}}` + "\n",
+		Format:     `{"time":"${time}","id":"${header:` + config.GetString("REQUEST_ID") + `}","ip":"${ip}","status":${status},"method":"${method}","uri":"${protocol}://${host}${url}","referer":"${referer}","ua":"${ua}","error":"${error}","latency":"${latency}"` + "\n",
 		TimeFormat: time.RFC3339,
 		Output:     os.Stdout,
 	}

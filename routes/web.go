@@ -15,6 +15,9 @@ func RegisterWeb(app *fiber.App) {
 
 	// Test to load static, compiled assets
 	app.Get("/test", func(c *fiber.Ctx) error {
-		return c.Render("test", fiber.Map{})
+		return c.Render("test", fiber.Map{
+			"Title": "ko",
+			"Body":  "Body!!!",
+		})
 	})
 }

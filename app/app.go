@@ -6,7 +6,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"go.uber.org/zap"
+	"golang.org/x/text/language"
 )
 
 type App struct {
@@ -14,6 +16,7 @@ type App struct {
 	DB     *database.Database
 	Store  *session.Store
 	Logger *zap.Logger
+	Bundle *i18n.Bundle
 	Config *config.Config
 }
 
@@ -29,6 +32,7 @@ func init() {
 		Server: fiber.New(config.GetFiberConfig()),
 		DB:     database.New(config.GetDatabaseDialector()),
 		Store:  session.New(config.GetSessionConfig()),
+		Bundle: i18n.NewBundle(language.English), // default set
 		Config: config,
 	}
 }
